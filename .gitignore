@@ -5,3 +5,6 @@ tensorboard/
 
 test.py
 Untitled.ipynb
+
+*.png
+*.jpg

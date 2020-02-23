@@ -4,4 +4,5 @@ Solving QQ captcha using CNN model with multi-labels.
 
 - explore_data
 - prepare_dataset
-- multi_outputs_cnn
+- cnn_multi_outputs
+- cnn_crop_inputs

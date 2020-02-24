@@ -6,5 +6,6 @@ tensorboard/
 test.py
 Untitled.ipynb
 
+*.tfrecords
 *.png
 *.jpg

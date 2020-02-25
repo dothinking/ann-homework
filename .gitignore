@@ -2,6 +2,7 @@ __pycache__/
 ckpt_*/
 .ipynb_checkpoints/
 tensorboard/
+models/
 
 test.py
 Untitled.ipynb

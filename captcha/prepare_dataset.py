@@ -161,6 +161,6 @@ def _decode_labels(labels, prefix):
     for i in range(4):
         c = tf.strings.substr(labels, i, 1) # labels example: b'abcd'
         label = tf.strings.unicode_decode(c, input_encoding='utf-8') - ord('a')
-        dict_labels[f'{prefix}_{i}'] = label
+        dict_labels[f'{prefix}{i}'] = label
 
     return dict_labels

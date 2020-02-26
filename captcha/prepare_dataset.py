@@ -58,11 +58,12 @@ def create_dataset_from_path(path_pattern,
 def create_dataset_from_tfrecord(record_file, 
     batch_size=32, 
     image_size=(60, 120), 
-    label_prefix='labels'):
+    label_prefix='labels',
+    buffer_size=1000000):
     '''create image/labels dataset from TFRecord file'''          
     return tf.data.TFRecordDataset(record_file).map(
         lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix)
-    ).batch(batch_size)
+    ).shuffle(buffer_size).batch(batch_size)
 
 
 def _split_train_test(file_pattern, test_rate=0.1, buffer_size=1000000):

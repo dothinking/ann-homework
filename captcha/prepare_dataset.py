@@ -62,7 +62,8 @@ def create_dataset_from_tfrecord(record_file,
     buffer_size=1000):
     '''create image/labels dataset from TFRecord file'''          
     return tf.data.TFRecordDataset(record_file).map(
-        lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix)
+        lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix),
+        num_parallel_calls=tf.data.experimental.AUTOTUNE # -1 any available CPUs
     ).shuffle(buffer_size).batch(batch_size)
 
 

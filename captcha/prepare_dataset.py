@@ -59,7 +59,7 @@ def create_dataset_from_tfrecord(record_file,
     batch_size=32, 
     image_size=(60, 120), 
     label_prefix='labels',
-    buffer_size=1000000):
+    buffer_size=1000):
     '''create image/labels dataset from TFRecord file'''          
     return tf.data.TFRecordDataset(record_file).map(
         lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix)

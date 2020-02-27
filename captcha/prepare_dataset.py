@@ -8,7 +8,7 @@ def write_images_to_tfrecord(image_file_pattern, # e.g. 'samples/*.jpg'
     dir_record, # folder for storing TFRecord files
     prefix_record='sample',
     split_test=0.1,  # split train/test rate
-    buffer_size=1000000):
+    buffer_size=10000):
     ''' load images and save to TFRecord file
             - get image raw data and labels (filename)
             - split into train / test sets
@@ -43,12 +43,13 @@ def write_images_to_tfrecord(image_file_pattern, # e.g. 'samples/*.jpg'
 def create_dataset_from_path(path_pattern, 
     batch_size=32, 
     image_size=(60, 120), 
-    label_prefix='labels'):            
+    label_prefix='labels',
+    grayscale=False): # load image and convert to grayscale
     # create path dataset
     # by default, `tf.data.Dataset.list_files` gets filenames 
     # in a non-deterministic random shuffled order
     return tf.data.Dataset.list_files(path_pattern).map(
-        lambda image_path: _parse_path_function(image_path, image_size, label_prefix)
+        lambda image_path: _parse_path_function(image_path, image_size, label_prefix, grayscale)
     ).batch(batch_size)
 
 
@@ -59,15 +60,16 @@ def create_dataset_from_tfrecord(record_file,
     batch_size=32, 
     image_size=(60, 120), 
     label_prefix='labels',
-    buffer_size=1000):
+    buffer_size=10000,
+    grayscale=False): # load image and convert to grayscale
     '''create image/labels dataset from TFRecord file'''          
     return tf.data.TFRecordDataset(record_file).map(
-        lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix),
+        lambda example_proto: _parse_image_function(example_proto, image_size, label_prefix, grayscale),
         num_parallel_calls=tf.data.experimental.AUTOTUNE # -1 any available CPUs
     ).shuffle(buffer_size).batch(batch_size)
 
 
-def _split_train_test(file_pattern, test_rate=0.1, buffer_size=1000000):
+def _split_train_test(file_pattern, test_rate, buffer_size):
     # by default, tf.data.Dataset.list_files always shuffles order during iteration
     # so set it false explicitly
     dataset = tf.data.Dataset.list_files(file_pattern, shuffle=False)
@@ -111,18 +113,18 @@ def _image_example(path):
     return tf.train.Example(features=tf.train.Features(feature=feature))
 
 
-def _parse_path_function(path, image_size, label_prefix):
+def _parse_path_function(path, image_size, label_prefix, grayscale):
     '''parse image data and labels from path'''
     raw_image = open(path, 'rb').read()
     labels = tf.strings.substr(path, -8, 4) # path example: b'xxx\abcd.jpg'
     # decode image array and labels
-    image_data = _decode_image(raw_image, image_size)
+    image_data = _decode_image(raw_image, image_size, grayscale)
     dict_labels = _decode_labels(labels, label_prefix)
 
     return image_data, dict_labels
 
 
-def _parse_image_function(example_proto, image_size, label_prefix):
+def _parse_image_function(example_proto, image_size, label_prefix, grayscale):
     '''Parse the input tf.Example protocal using the dictionary describing the features'''
     image_feature_description = {
         'labels'   : tf.io.FixedLenFeature([], tf.string),
@@ -131,13 +133,13 @@ def _parse_image_function(example_proto, image_size, label_prefix):
     image_features = tf.io.parse_single_example(example_proto, image_feature_description)
     
     # decode image array and labels
-    image_data = _decode_image(image_features['image_raw'], image_size)
+    image_data = _decode_image(image_features['image_raw'], image_size, grayscale)
     dict_labels = _decode_labels(image_features['labels'], label_prefix)
     
     return image_data, dict_labels
 
 
-def _decode_image(image, resize=(60, 120)):
+def _decode_image(image, resize, grayscale):
     '''preprocess image with given raw data
         - image: image raw data
     '''
@@ -148,9 +150,10 @@ def _decode_image(image, resize=(60, 120)):
     image = tf.image.resize(image, resize)
     
     # RGB to grayscale -> channels=1
-    image = tf.image.rgb_to_grayscale(image)
+    if grayscale:
+        image = tf.image.rgb_to_grayscale(image) # shape=(h, w, 1)
 
-    return image # shape=(h, w, 1)
+    return image # (h, w, c)
 
 
 def _decode_labels(labels, prefix):

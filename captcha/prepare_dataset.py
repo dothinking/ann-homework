@@ -1,5 +1,39 @@
-import tensorflow as tf
 import os
+import random
+import string
+import tensorflow as tf
+from captcha.image import ImageCaptcha
+
+
+
+# --------------------------------------------
+# create sample captcha with python module
+# --------------------------------------------
+def generate_captcha_samples(image_dir, # storing folder
+    num=1000,  # count of captcha
+    label=1): # 1-digits, 2-lower case alphabet, 4-upper case alphabet
+    '''create captcha image file with labels as name'''
+    # random captcha labels
+    # combination of single label mode, 
+    # e.g. 3=1+2, both digits and lower case alphabet are allowed
+    modes = [0b1, 0b10, 0b100]
+    sources = [string.digits, string.ascii_lowercase, string.ascii_uppercase]
+    if label<1: label = 1
+    if label>7: label = 7
+    characters = ''
+    for mode, source in zip(modes, sources):
+        if label & mode: characters += source
+            
+    # create captcha with four random characters
+    generator = ImageCaptcha(width=width,height=height)
+    for i in range(num):
+        labels = ''.join([random.choice(characters) for j in range(4)])
+        image = generator.generate_image(labels)
+        # write file
+        lower_labels = [c.lower() for c in labels]
+        filename = f'{"".join(lower_labels)}.jpg'
+        image.save(os.path.join(image_dir, filename))
+
 
 # --------------------------------------------
 # Write raw image data to `images.tfrecords`

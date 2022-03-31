@@ -1,6 +1,6 @@
-# TensorFlow Homework
+# ANN Homework
 
-Demo and practice on the road learning ANN and TensorFlow 2.0
+Artificial Neural Network demo and practice with TensorFlow 2.0 and PyTorch.
 
 - [MNIST](/mnist)
 - [CAPTCHA](/captcha)

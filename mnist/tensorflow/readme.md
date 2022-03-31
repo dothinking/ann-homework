@@ -1,4 +1,4 @@
-# MNIST
+# Play MNIST with TensorFlow
 
 	- exploring_mnist
 	- nn_tensorflow

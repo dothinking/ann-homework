@@ -1,4 +1,4 @@
-# CAPTCHA
+# Play CAPTCHA with TensorFlow
 
 Solving captcha using CNN model with multi-labels. Two kinds of datasets are used:
 

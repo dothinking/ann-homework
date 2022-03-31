@@ -4,6 +4,7 @@ ckpt_*/
 tensorboard/
 models/
 .vscode/
+dataset/
 
 test.py
 Untitled.ipynb

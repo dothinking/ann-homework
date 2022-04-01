@@ -3,9 +3,11 @@ ckpt_*/
 .ipynb_checkpoints/
 tensorboard/
 models/
-.vscode/
-dataset/
 
+dataset/
+samples/
+
+.vscode/
 test.py
 Untitled.ipynb
 

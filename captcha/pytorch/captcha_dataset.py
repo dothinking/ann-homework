@@ -65,6 +65,15 @@ class CaptchaData(Dataset):
     def __getitem__(self, idx:int):
         label = self.labels[idx]
         return self.__load_image(label), encode(label)
+    
+
+    @property
+    def data(self): 
+        return torch.Tensor([self.__load_image(label) for label in self.labels])
+
+    @property
+    def targets(self): 
+        return torch.Tensor(self.labels)
 
     
     def __load_image(self, label):
